@@ -1,0 +1,19 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 90_director-0.2.8-1.5.3.dpatch by Thomas Günther <tom@toms-cafe.de>
+## http://toms-cafe.de/vdr/download/director-0.2.8-1.5.3.diff
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Changes for VDR >= 1.5.3.
+
+@DPATCH@
+--- director-0.2.8/directorosd.c
++++ director-0.2.8/directorosd.c
+@@ -300,7 +300,7 @@ void cDirectorOsd::drawOsd(void)
+ 		char *buffer=0;
+ 		asprintf(&buffer,"1 %s %d", Channel->Name(), number);
+ 				
+-		int theHeigth = font->Height('A');
++		int theHeigth = font->Height();
+ 		int m_height = (number * theHeigth) + 10;
+ 		
+ 		//get the width		

@@ -1,0 +1,392 @@
+
+This is a semi-automatically created i18n adaptation patch and may contain
+errors (such as missing translations). This should only be used as a
+temporary measure until the upstream plugin maintainer fixes the plugin
+properly according to the instructions in i18n-to-gettext.pl.
+
+Created for Mandriva Linux packaging by Anssi Hannula <anssi@mandriva.org>.
+
+
+Index: director-0.2.8/Makefile
+===================================================================
+--- director-0.2.8/Makefile
++++ director-0.2.8/Makefile	2008-04-22 19:32:46.000000000 +0300
+@@ -50,7 +50,7 @@
+ 
+ ### The object files (add further files here):
+ 
+-OBJS = $(PLUGIN).o directorosd.o i18n.o
++OBJS = $(PLUGIN).o directorosd.o 
+ 
+ ### Implicit rules:
+ 
+@@ -66,9 +66,34 @@
+ 
+ -include $(DEPFILE)
+ 
++### Internationalization (I18N):
++
++PODIR     = po
++LOCALEDIR = $(VDRDIR)/locale
++I18Npo    = $(wildcard $(PODIR)/*.po)
++I18Nmsgs  = $(addprefix $(LOCALEDIR)/, $(addsuffix /LC_MESSAGES/vdr-$(PLUGIN).mo, $(notdir $(foreach file, $(I18Npo), $(basename $(file))))))
++I18Npot   = $(PODIR)/$(PLUGIN).pot
++
++%.mo: %.po
++	msgfmt -c -o $@ $<
++
++$(I18Npot): $(wildcard *.[ch] *.[ch]xx *.cc *.[ch]pp *.hh)
++	xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --msgid-bugs-address='<http://qa.mandriva.com/>' -o $@ $^
++
++%.po: $(I18Npot)
++	msgmerge -U --no-wrap --no-location --backup=none -q $@ $<
++	@touch $@
++
++$(I18Nmsgs): $(LOCALEDIR)/%/LC_MESSAGES/vdr-$(PLUGIN).mo: $(PODIR)/%.mo
++	@mkdir -p $(dir $@)
++	cp $< $@
++
++.PHONY: i18n
++i18n: $(I18Nmsgs)
++
+ ### Targets:
+ 
+-all: libvdr-$(PLUGIN).so
++all: libvdr-$(PLUGIN).so i18n
+ 
+ libvdr-$(PLUGIN).so: $(OBJS)
+ 	$(CXX) $(CXXFLAGS) -shared $(OBJS) -o $@
+@@ -83,4 +108,5 @@
+ 	@echo Distribution package created as $(PACKAGE).tgz
+ 
+ clean:
++	@-rm -f $(PODIR)/*.mo $(PODIR)/*.pot
+ 	@-rm -f $(OBJS) $(DEPFILE) *.so *.tgz core* *~
+Index: director-0.2.8/director.c
+===================================================================
+--- director-0.2.8/director.c
++++ director-0.2.8/director.c	2008-04-22 19:32:46.000000000 +0300
+@@ -6,7 +6,7 @@
+  * $Id$
+  */
+ 
+-#include "i18n.h"
++
+ #include "director.h"
+ #include "directorosd.h"
+ 
+@@ -56,7 +56,7 @@
+ bool cPluginDirector::Start(void)
+ {
+   // Start any background activities the plugin shall perform.
+-  RegisterI18n(Phrases);
++  
+   if(autostart == 1)
+   	directorStatus = new cDirectorStatus(this);
+   // Default values for setup
+Index: director-0.2.8/i18n.c
+===================================================================
+--- director-0.2.8/i18n.c
++++ director-0.2.8/i18n.c	2008-04-22 19:32:46.000000000 +0300
+@@ -1,132 +0,0 @@
+- /*
+- * autotimer.c: A plugin for the Video Disk Recorder
+- *
+- * See the README file for copyright information and how to reach the author.
+- *
+- * $Id: i18n.c Exp $
+- */
+-
+-#include "i18n.h"
+-
+-const tI18nPhrase Phrases[] = {
+-  { "Hide main menu entry",
+-    "Hauptmenüeintrag verstecken",
+-    "",// TODO
+-    "Nascondi voce nel menù principale",// Italiano
+-    "",// TODO
+-    "",// TODO
+-    "Invisible dans le menu principal",
+-    "",// TODO
+-    "Piilota valinta päävalikosta",
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO 
+-#if VDRVERSNUM && VDRVERSNUM >= 10313
+-    "", // Eesti
+-#if VDRVERSNUM >= 10316
+-    "", // Dansk
+-#endif
+-#endif
+-  },
+-  { "Swap up and down",
+-    "Tasten auf und ab vertauschen",
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-#if VDRVERSNUM && VDRVERSNUM >= 10313
+-    "", // Eesti
+-#if VDRVERSNUM >= 10316
+-    "", // Dansk
+-#endif
+-#endif
+-  },
+-  { "Portal Mode",
+-    "Portal Mode",
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-#if VDRVERSNUM && VDRVERSNUM >= 10313
+-    "", // Eesti
+-#if VDRVERSNUM >= 10316
+-    "", // Dansk
+-#endif
+-#endif
+-  },
+- { "Display info on channel change",
+-    "Kanalinfo beim umschalten anzeigen",
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-#if VDRVERSNUM && VDRVERSNUM >= 10313
+-    "", // Eesti
+-#if VDRVERSNUM >= 10316
+-    "", // Dansk
+-#endif
+-#endif
+-  },
+-{ "Start the plugin automatically",
+-    "Das Plugin automatisch starten",
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-    "",// TODO
+-#if VDRVERSNUM && VDRVERSNUM >= 10313
+-    "", // Eesti
+-#if VDRVERSNUM >= 10316
+-    "", // Dansk
+-#endif
+-#endif
+-  },
+-  { NULL }
+-  };
+Index: director-0.2.8/i18n.h
+===================================================================
+--- director-0.2.8/i18n.h
++++ director-0.2.8/i18n.h	2008-04-22 19:32:46.000000000 +0300
+@@ -1,16 +0,0 @@
+-/*
+- * autotimer.c: A plugin for the Video Disk Recorder
+- *
+- * See the README file for copyright information and how to reach the author.
+- *
+- * $Id: i18n.h 1.0 Exp $
+- */
+-
+-#ifndef _I18N__H
+-#define _I18N__H
+-
+-#include <vdr/i18n.h>
+-
+-extern const tI18nPhrase Phrases[];
+-
+-#endif //_I18N__H
+Index: director-0.2.8/po/de_DE.po
+===================================================================
+--- director-0.2.8/po/de_DE.po
++++ director-0.2.8/po/de_DE.po	2008-04-22 19:32:46.000000000 +0300
+@@ -0,0 +1,44 @@
++# VDR director plugin language source file.
++# Copyright (C) YEAR THE VDR-director'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the VDR-director package.
++# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
++#
++msgid ""
++msgstr ""
++"Project-Id-Version: VDR-director\n"
++"Report-Msgid-Bugs-To: http://qa.mandriva.com/\n"
++"POT-Creation-Date: 2008-04-22 19:32+0300\n"
++"PO-Revision-Date: 2008-04-22 19:32+0300\n"
++"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
++"Language-Team: <vdr@linuxtv.org>\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=ISO-8859-15\n"
++"Content-Transfer-Encoding: 8bit\n"
++
++#: director.c:105
++msgid "Hide main menu entry"
++msgstr "Hauptmenüeintrag verstecken"
++
++#: director.c:105 director.c:106 director.c:107 director.c:108 director.c:109
++msgid "no"
++msgstr ""
++
++#: director.c:105 director.c:106 director.c:107 director.c:108 director.c:109
++msgid "yes"
++msgstr ""
++
++#: director.c:106
++msgid "Swap up and down"
++msgstr "Tasten auf und ab vertauschen"
++
++#: director.c:107
++msgid "Portal Mode"
++msgstr "Portal Mode"
++
++#: director.c:108
++msgid "Display info on channel change"
++msgstr "Kanalinfo beim umschalten anzeigen"
++
++#: director.c:109
++msgid "Start the plugin automatically"
++msgstr "Das Plugin automatisch starten"
+Index: director-0.2.8/po/director.pot
+===================================================================
+--- director-0.2.8/po/director.pot
++++ director-0.2.8/po/director.pot	2008-04-22 19:32:46.000000000 +0300
+@@ -0,0 +1,45 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
++#
++#, fuzzy
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: http://qa.mandriva.com/\n"
++"POT-Creation-Date: 2008-04-22 19:32+0300\n"
++"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
++"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
++"Language-Team: LANGUAGE <LL@li.org>\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=CHARSET\n"
++"Content-Transfer-Encoding: 8bit\n"
++
++#: director.c:105
++msgid "Hide main menu entry"
++msgstr ""
++
++#: director.c:105 director.c:106 director.c:107 director.c:108 director.c:109
++msgid "no"
++msgstr ""
++
++#: director.c:105 director.c:106 director.c:107 director.c:108 director.c:109
++msgid "yes"
++msgstr ""
++
++#: director.c:106
++msgid "Swap up and down"
++msgstr ""
++
++#: director.c:107
++msgid "Portal Mode"
++msgstr ""
++
++#: director.c:108
++msgid "Display info on channel change"
++msgstr ""
++
++#: director.c:109
++msgid "Start the plugin automatically"
++msgstr ""
+Index: director-0.2.8/po/fr_FR.po
+===================================================================
+--- director-0.2.8/po/fr_FR.po
++++ director-0.2.8/po/fr_FR.po	2008-04-22 19:32:46.000000000 +0300
+@@ -0,0 +1,44 @@
++# VDR director plugin language source file.
++# Copyright (C) YEAR THE VDR-director'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the VDR-director package.
++# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
++#
++msgid ""
++msgstr ""
++"Project-Id-Version: VDR-director\n"
++"Report-Msgid-Bugs-To: http://qa.mandriva.com/\n"
++"POT-Creation-Date: 2008-04-22 19:32+0300\n"
++"PO-Revision-Date: 2008-04-22 19:32+0300\n"
++"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
++"Language-Team: <vdr@linuxtv.org>\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=ISO-8859-1\n"
++"Content-Transfer-Encoding: 8bit\n"
++
++#: director.c:105
++msgid "Hide main menu entry"
++msgstr "Invisible dans le menu principal"
++
++#: director.c:105 director.c:106 director.c:107 director.c:108 director.c:109
++msgid "no"
++msgstr ""
++
++#: director.c:105 director.c:106 director.c:107 director.c:108 director.c:109
++msgid "yes"
++msgstr ""
++
++#: director.c:106
++msgid "Swap up and down"
++msgstr ""
++
++#: director.c:107
++msgid "Portal Mode"
++msgstr ""
++
++#: director.c:108
++msgid "Display info on channel change"
++msgstr ""
++
++#: director.c:109
++msgid "Start the plugin automatically"
++msgstr ""
