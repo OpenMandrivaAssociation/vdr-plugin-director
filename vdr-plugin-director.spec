@@ -4,7 +4,7 @@
 Summary:	VDR plugin: plugin to use the premiere multifeed option
 Name:		vdr-plugin-%plugin
 Version:	0.2.8
-Release:	19
+Release:	20
 Group:		Video
 License:	GPL
 URL:		http://www.wontorra.net/staticpages/index.php?page=director
