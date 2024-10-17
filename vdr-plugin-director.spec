@@ -7,7 +7,7 @@ Version:	0.2.8
 Release:	20
 Group:		Video
 License:	GPL
-URL:		http://www.wontorra.net/staticpages/index.php?page=director
+URL:		https://www.wontorra.net/staticpages/index.php?page=director
 Source:		vdr-%plugin-%{version}.tar.bz2
 Patch0:		90_director-0.2.8-1.5.3.dpatch
 Patch1:		director-0.2.8-i18n-1.6.patch
